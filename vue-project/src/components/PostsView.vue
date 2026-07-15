@@ -6,6 +6,7 @@ export default {
       posts: localPosts
         ? (JSON.parse(localPosts) as { title: string; text: string; id: number }[])
         : [],
+      comments: [],
       user: localStorage.getItem('nameVue'),
       showAside: false,
       titleVue: '',
@@ -13,6 +14,7 @@ export default {
       number: localPosts ? JSON.parse(localPosts).length : 0,
       selectedPost: null as number | null,
       postSelected: false,
+      isComment: false,
     }
   },
   methods: {
@@ -53,6 +55,9 @@ export default {
       })
       localStorage.setItem('postsVue', JSON.stringify(this.posts))
       window.location.reload()
+    },
+    showCommentForm() {
+      this.isComment = true
     },
   },
 }
@@ -185,6 +190,13 @@ export default {
               </div>
             </div>
             <p>{{ posts.find((post) => post.id === selectedPost)?.text }}</p>
+            <div v-if="comments.length > 0"></div>
+            <div v-if="comments.length == 0">
+              <h2 class="mt-5 title">No comments yet</h2>
+            </div>
+            <button v-if="!isComment" class="mt-5 button is-link" @click="showCommentForm">
+              Write a comment
+            </button>
           </div>
         </div>
       </div>
