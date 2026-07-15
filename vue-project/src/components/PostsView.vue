@@ -7,13 +7,21 @@ export default {
       posts: localPosts
         ? (JSON.parse(localPosts) as { title: string; text: string; id: number }[])
         : [],
-      comments: [] as {
-        author: string
-        email: string
-        authorId: number | null
-        postId: number
-        message: string
-      }[],
+      comments: localComments
+        ? (JSON.parse(localComments) as {
+            author: string
+            email: string
+            authorId: number | null
+            postId: number
+            message: string
+          }[])
+        : ([] as {
+            author: string
+            email: string
+            authorId: number | null
+            postId: number
+            message: string
+          }[]),
       user: localStorage.getItem('nameVue'),
       showAside: false,
       titleVue: '',
@@ -48,7 +56,6 @@ export default {
         text: this.postVue,
         id: (this.number += 1),
       })
-
       localStorage.setItem('postsVue', JSON.stringify(this.posts))
     },
     showPost(id: number) {
@@ -90,6 +97,7 @@ export default {
         message: this.postMessage,
       })
       this.isComment = false
+      localStorage.setItem('commentsVue', JSON.stringify(this.comments))
     },
   },
 }
@@ -226,15 +234,19 @@ export default {
             <div v-if="comments.length == 0">
               <h2 class="mt-5 title">No comments yet</h2>
             </div>
-            <div v-else>
-              <article class="is-small" v-for="comment in comments" :key="comment.postId">
-                <div>
-                  <a :href="`mailto:${authorEmail}`">{{ authorName }}</a>
-                  <button type="button" class="is-small">
+            <div v-if="comments.length > 0 && !isComment" class="mt-5">
+              <article
+                class="is-small"
+                v-for="comment in comments.filter((c) => c.postId === selectedPost)"
+                :key="comment.postId"
+              >
+                <div class="is-flex is-justify-content-space-between">
+                  <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
+                  <button type="button" class="button is-small is-text has-text-danger">
                     <i class="fa fa-close"></i>
                   </button>
                 </div>
-                <div>{{ postMessage }}</div>
+                <div>{{ comment.message }}</div>
               </article>
             </div>
             <form v-if="isComment" class="mt-5">
