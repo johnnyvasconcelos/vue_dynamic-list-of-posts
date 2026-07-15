@@ -29,6 +29,10 @@ export default {
         localStorage.setItem('emailVue', this.email)
         localStorage.setItem('nameVue', this.name)
         localStorage.setItem('loggedVue', 'yes')
+
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       }
     },
     verification() {

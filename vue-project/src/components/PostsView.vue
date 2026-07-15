@@ -6,6 +6,14 @@ export default {
       user: localStorage.getItem('nameVue'),
     }
   },
+  methods: {
+    logout() {
+      localStorage.removeItem('nameVue')
+      localStorage.removeItem('emailVue')
+      this.user = null
+      window.location.reload()
+    },
+  },
 }
 </script>
 
@@ -18,7 +26,7 @@ export default {
           <div class="is-flex is-align-items-center is-justify-content-space-between">
             <p>User: {{ user }}</p>
             &nbsp;&nbsp;
-            <button type="button" class="button is-text">Logout</button>
+            <button type="button" class="button is-text" @click="logout">Logout</button>
           </div>
         </div>
 
