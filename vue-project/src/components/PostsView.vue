@@ -2,19 +2,30 @@
 export default {
   data() {
     const localPosts = localStorage.getItem('postsVue')
+    const localComments = localStorage.getItem('commentsVue')
     return {
       posts: localPosts
         ? (JSON.parse(localPosts) as { title: string; text: string; id: number }[])
         : [],
-      comments: [],
+      comments: [] as {
+        author: string
+        email: string
+        authorId: number | null
+        postId: number
+        message: string
+      }[],
       user: localStorage.getItem('nameVue'),
       showAside: false,
       titleVue: '',
       postVue: '',
       number: localPosts ? JSON.parse(localPosts).length : 0,
+      ID: localComments ? JSON.parse(localComments).length : 0,
       selectedPost: null as number | null,
       postSelected: false,
       isComment: false,
+      authorName: '',
+      authorEmail: '',
+      postMessage: '',
     }
   },
   methods: {
@@ -42,9 +53,14 @@ export default {
     },
     showPost(id: number) {
       // console.log(id)
-      this.selectedPost = id
-      this.showAside = !this.showAside
-      this.postSelected = true
+      if (this.showAside && this.selectedPost === id) {
+        this.showAside = false
+        this.postSelected = false
+      } else {
+        this.selectedPost = id
+        this.showAside = true
+        this.postSelected = true
+      }
     },
     deleteItem() {
       const post = this.posts.find((item) => {
@@ -58,6 +74,22 @@ export default {
     },
     showCommentForm() {
       this.isComment = true
+    },
+    cancelComment() {
+      this.isComment = false
+      this.authorName = ''
+      this.authorEmail = ''
+      this.postMessage = ''
+    },
+    addComment() {
+      this.comments.push({
+        author: this.authorName,
+        authorId: this.selectedPost,
+        postId: (this.ID += 1),
+        email: this.authorEmail,
+        message: this.postMessage,
+      })
+      this.isComment = false
     },
   },
 }
@@ -145,7 +177,7 @@ export default {
                 />
                 <label for="postVue">Write Post Body</label>
                 <textarea
-                  class="input"
+                  class="textarea"
                   placeholder="Post body"
                   id="postVue"
                   name="postVue"
@@ -194,6 +226,52 @@ export default {
             <div v-if="comments.length == 0">
               <h2 class="mt-5 title">No comments yet</h2>
             </div>
+            <div v-else>
+              <article class="is-small" v-for="comment in comments" :key="comment.postId">
+                <div>
+                  <a :href="`mailto:${authorEmail}`">{{ authorName }}</a>
+                  <button type="button" class="is-small">
+                    <i class="fa fa-close"></i>
+                  </button>
+                </div>
+                <div>{{ postMessage }}</div>
+              </article>
+            </div>
+            <form v-if="isComment" class="mt-5">
+              <div class="is-flex is-flex-direction-column" style="gap: 10px">
+                <label for="authorName">Author Name</label>
+                <input
+                  type="text"
+                  class="input"
+                  id="authorName"
+                  v-model="authorName"
+                  name="authorName"
+                  placeholder="Name Surname"
+                />
+                <label for="authorEmail">Author Email</label>
+                <input
+                  type="email"
+                  placeholder="Your Email"
+                  id="authorEmail"
+                  class="input"
+                  v-model="authorEmail"
+                  required
+                />
+                <label for="postComment">Write Post Body</label>
+                <textarea
+                  class="textarea"
+                  name="postMessage"
+                  id="postMessage"
+                  placeholder="Comment"
+                  v-model="postMessage"
+                  required
+                ></textarea>
+              </div>
+              <div class="mt-5">
+                <button class="button is-link" @click="addComment">Add comment</button>&nbsp;
+                <button class="button is-text" @click="cancelComment">Cancel</button>
+              </div>
+            </form>
             <button v-if="!isComment" class="mt-5 button is-link" @click="showCommentForm">
               Write a comment
             </button>
