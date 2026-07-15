@@ -10,8 +10,9 @@ export default {
       showAside: false,
       titleVue: '',
       postVue: '',
-      number: 0,
-      selectedPost: 1,
+      number: localPosts ? JSON.parse(localPosts).length : 0,
+      selectedPost: null as number | null,
+      postSelected: false,
     }
   },
   methods: {
@@ -22,7 +23,11 @@ export default {
       window.location.reload()
     },
     asideShow() {
-      this.showAside = !this.showAside
+      if (this.postSelected == true) {
+        this.postSelected = false
+      } else {
+        this.showAside = !this.showAside
+      }
     },
     storeText() {
       this.posts.push({
@@ -30,12 +35,24 @@ export default {
         text: this.postVue,
         id: (this.number += 1),
       })
+
       localStorage.setItem('postsVue', JSON.stringify(this.posts))
     },
     showPost(id: number) {
-      // console.log(text)
+      // console.log(id)
       this.selectedPost = id
       this.showAside = !this.showAside
+      this.postSelected = true
+    },
+    deleteItem() {
+      const post = this.posts.find((item) => {
+        return item.id === this.selectedPost
+      })
+      this.posts = this.posts.filter((item) => {
+        return item !== post
+      })
+      localStorage.setItem('postsVue', JSON.stringify(this.posts))
+      window.location.reload()
     },
   },
 }
@@ -94,6 +111,7 @@ export default {
           </div>
 
           <div
+            v-if="!postSelected"
             class="is-flex is-flex-direction-column"
             :style="{
               width: showAside ? '500px' : '0px',
@@ -141,6 +159,32 @@ export default {
                 </div>
               </div>
             </form>
+          </div>
+          <div
+            v-else
+            :style="{
+              width: showAside ? '500px' : '0px',
+              height: showAside ? 'auto' : '0px',
+              minWidth: showAside ? '500px' : '0px',
+              marginLeft: showAside ? '1.5rem' : '0px',
+              paddingLeft: showAside ? '20px' : '0px',
+              gap: showAside ? '15px' : '0px',
+              overflow: 'hidden',
+              transition: '0.4s',
+            }"
+          >
+            <div class="is-flex is-justify-content-space-between is-align-items-center">
+              <h2 class="title">
+                #{{ posts.find((post) => post.id === selectedPost)?.id }}:
+                {{ posts.find((post) => post.id === selectedPost)?.title }}
+              </h2>
+              <div>
+                <button type="button" @click="deleteItem">
+                  <i class="fa fa-trash has-text-danger"></i>
+                </button>
+              </div>
+            </div>
+            <p>{{ posts.find((post) => post.id === selectedPost)?.text }}</p>
           </div>
         </div>
       </div>
