@@ -99,6 +99,12 @@ export default {
       this.isComment = false
       localStorage.setItem('commentsVue', JSON.stringify(this.comments))
     },
+    deletePost(commentId: number) {
+      this.comments = this.comments.filter((c) => {
+        return c.postId !== commentId
+      })
+      localStorage.setItem('commentsVue', JSON.stringify(this.comments))
+    },
   },
 }
 </script>
@@ -236,13 +242,17 @@ export default {
             </div>
             <div v-if="comments.length > 0 && !isComment" class="mt-5">
               <article
-                class="is-small"
-                v-for="comment in comments.filter((c) => c.postId === selectedPost)"
+                class="is-small mt-3"
+                v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
                 :key="comment.postId"
               >
                 <div class="is-flex is-justify-content-space-between">
                   <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
-                  <button type="button" class="button is-small is-text has-text-danger">
+                  <button
+                    type="button"
+                    class="button is-small is-text has-text-danger"
+                    @click="deletePost(comment.postId)"
+                  >
                     <i class="fa fa-close"></i>
                   </button>
                 </div>
