@@ -15,6 +15,8 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.0",
+    "bulma": "^1.0.4",
     "vue": "^3.5.38"
   },
   "devDependencies": {
@@ -32,12 +34,15 @@
     "oxlint": "~1.69.0",
     "prettier": "3.8.4",
     "typescript": "~6.0.0",
-    "vite": "^8.0.16",
+    "vite": "^6.4.3",
     "vite-plugin-vue-devtools": "^8.1.2",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.5"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-win32-x64-msvc": "^1.1.5"
   }
 }
