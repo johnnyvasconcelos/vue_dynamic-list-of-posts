@@ -11,6 +11,7 @@ export default {
       titleVue: '',
       postVue: '',
       number: 0,
+      selectedPost: 1,
     }
   },
   methods: {
@@ -31,8 +32,10 @@ export default {
       })
       localStorage.setItem('postsVue', JSON.stringify(this.posts))
     },
-    showPost(text: string) {
+    showPost(id: number) {
       // console.log(text)
+      this.selectedPost = id
+      this.showAside = !this.showAside
     },
   },
 }
@@ -74,8 +77,14 @@ export default {
                   <td>{{ post.id }}</td>
                   <td>{{ post.title }}</td>
                   <td class="has-text-right is-vcentered">
-                    <button type="button" class="button is-link" @click="showPost(post.text)">
-                      Open
+                    <button
+                      type="button"
+                      :class="
+                        showAside && selectedPost === post.id ? 'button is-text' : 'button is-link'
+                      "
+                      @click="showPost(post.id)"
+                    >
+                      {{ showAside && selectedPost === post.id ? 'Close' : 'Open' }}
                     </button>
                   </td>
                 </tr>
