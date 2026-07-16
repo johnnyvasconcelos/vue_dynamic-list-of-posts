@@ -58,6 +58,7 @@ export default {
       } else {
         this.showAside = !this.showAside
       }
+      this.editForm = false
     },
     storeText() {
       this.posts.push({
@@ -94,6 +95,7 @@ export default {
     },
     editItem() {
       this.editForm = true
+      this.isComment = false
     },
     showCommentForm() {
       this.isComment = true
@@ -104,6 +106,9 @@ export default {
       this.authorEmail = ''
       this.postMessage = ''
     },
+    cancelEditForm() {
+      this.editForm = false
+    },
     addComment() {
       this.comments.push({
         author: this.authorName,
@@ -113,6 +118,7 @@ export default {
         message: this.postMessage,
       })
       this.isComment = false
+      this.editForm = false
       localStorage.setItem('commentsVue', JSON.stringify(this.comments))
       this.postMessage = ''
     },
@@ -215,7 +221,7 @@ export default {
                   transition: '0.4s',
                 }"
               >
-                <div v-if="!postSelected" class="is-flex is-flex-direction-column">
+                <div v-if="!postSelected && !editForm" class="is-flex is-flex-direction-column">
                   <h2>Create new posts</h2>
                   <FormPost
                     :storeText="storeText"
@@ -254,7 +260,7 @@ export default {
                   <Loader v-if="isLoading" />
 
                   <div v-else>
-                    <div v-if="comments.length > 0 && !isComment" class="mt-5">
+                    <div v-if="comments.length > 0 && !isComment && !editForm" class="mt-5">
                       <article
                         class="is-small message mt-3"
                         v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
@@ -365,11 +371,17 @@ export default {
 
                     <div class="mt-5">
                       <button class="button is-link" @click="addComment">Add comment</button>&nbsp;
-                      <button class="button is-text" @click="cancelComment">Cancel</button>
+                      <button class="button is-text" @click="cancelEditForm" type="button">
+                        Cancel
+                      </button>
                     </div>
                   </form>
 
-                  <button v-if="!isComment" class="mt-5 button is-link" @click="showCommentForm">
+                  <button
+                    v-if="!isComment && !editForm"
+                    class="mt-5 button is-link"
+                    @click="showCommentForm"
+                  >
                     Write a comment
                   </button>
                 </div>
