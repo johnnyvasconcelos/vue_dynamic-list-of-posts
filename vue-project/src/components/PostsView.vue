@@ -1,8 +1,10 @@
 <script lang="ts">
 import FormPost from './FormPost.vue'
+import Loader from './LoadingView.vue'
 export default {
   components: {
     FormPost,
+    Loader,
   },
   data() {
     const localPosts = localStorage.getItem('postsVue')
@@ -38,6 +40,8 @@ export default {
       authorName: '',
       authorEmail: '',
       postMessage: '',
+      isLoading: false,
+      isLoadingLoad: true,
     }
   },
   methods: {
@@ -71,6 +75,10 @@ export default {
         this.selectedPost = id
         this.showAside = true
         this.postSelected = true
+        this.isLoading = true
+        setTimeout(() => {
+          this.isLoading = false
+        }, 2500)
       }
     },
     deleteItem() {
@@ -102,6 +110,7 @@ export default {
       })
       this.isComment = false
       localStorage.setItem('commentsVue', JSON.stringify(this.comments))
+      this.postMessage = ''
     },
     deletePost(commentId: number) {
       this.comments = this.comments.filter((c) => {
@@ -109,6 +118,11 @@ export default {
       })
       localStorage.setItem('commentsVue', JSON.stringify(this.comments))
     },
+  },
+  created() {
+    setTimeout(() => {
+      this.isLoadingLoad = false
+    }, 2000)
   },
 }
 </script>
@@ -143,44 +157,47 @@ export default {
                   Add New Post
                 </button>
               </div>
-
-              <table
-                class="table is-fullwidth is-striped is-hoverable is-narrow"
-                v-if="posts.length > 0"
-              >
-                <thead>
-                  <tr class="has-background-link-light">
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th class="has-text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="post in posts" :key="post.id">
-                    <td>{{ post.id }}</td>
-                    <td>{{ post.title }}</td>
-                    <td class="has-text-right is-vcentered">
-                      <button
-                        type="button"
-                        :class="
-                          showAside && selectedPost === post.id
-                            ? 'button is-text'
-                            : 'button is-link'
-                        "
-                        @click="showPost(post.id)"
-                      >
-                        {{ showAside && selectedPost === post.id ? 'Close' : 'Open' }}
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <p class="has-text-centered" v-else>No posts yet.</p>
+              <Loader v-if="isLoadingLoad" />
+              <div v-else>
+                <table
+                  class="table is-fullwidth is-striped is-hoverable is-narrow"
+                  v-if="posts.length > 0"
+                >
+                  <thead>
+                    <tr class="has-background-link-light">
+                      <th>ID</th>
+                      <th>Title</th>
+                      <th class="has-text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="post in posts" :key="post.id">
+                      <td>{{ post.id }}</td>
+                      <td>{{ post.title }}</td>
+                      <td class="has-text-right is-vcentered">
+                        <button
+                          type="button"
+                          :class="
+                            showAside && selectedPost === post.id
+                              ? 'button is-text'
+                              : 'button is-link'
+                          "
+                          @click="showPost(post.id)"
+                        >
+                          {{ showAside && selectedPost === post.id ? 'Close' : 'Open' }}
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="has-text-centered" v-else>No posts yet.</p>
+              </div>
             </div>
 
             <div
               v-if="!postSelected"
               class="is-flex is-flex-direction-column"
+              :class="{ 'Sidebar--open': showAside }"
               :style="{
                 width: showAside ? '500px' : '0px',
                 height: showAside ? 'auto' : '0px',
@@ -232,24 +249,27 @@ export default {
               <div v-if="comments.length == 0">
                 <h2 class="mt-5 title">No comments yet</h2>
               </div>
-              <div v-if="comments.length > 0 && !isComment" class="mt-5">
-                <article
-                  class="is-small message mt-3"
-                  v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
-                  :key="comment.postId"
-                >
-                  <div class="is-flex is-justify-content-space-between">
-                    <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
-                    <button
-                      type="button"
-                      class="button is-small is-text has-text-danger"
-                      @click="deletePost(comment.postId)"
-                    >
-                      <i class="fa fa-close"></i>
-                    </button>
-                  </div>
-                  <div>{{ comment.message }}</div>
-                </article>
+              <Loader v-if="isLoading" />
+              <div v-else>
+                <div v-if="comments.length > 0 && !isComment" class="mt-5">
+                  <article
+                    class="is-small message mt-3"
+                    v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
+                    :key="comment.postId"
+                  >
+                    <div class="is-flex is-justify-content-space-between">
+                      <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
+                      <button
+                        type="button"
+                        class="button is-small is-text has-text-danger"
+                        @click="deletePost(comment.postId)"
+                      >
+                        <i class="fa fa-close"></i>
+                      </button>
+                    </div>
+                    <div>{{ comment.message }}</div>
+                  </article>
+                </div>
               </div>
               <form v-if="isComment" class="mt-5">
                 <div class="is-flex is-flex-direction-column" style="gap: 10px">
