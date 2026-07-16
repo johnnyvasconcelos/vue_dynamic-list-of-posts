@@ -1,9 +1,13 @@
 <script lang="ts">
 import FormPost from './FormPost.vue'
 import Loader from './LoadingView.vue'
+import FormComment from './FormComment.vue'
+import FormEdit from './FormEdit.vue'
 export default {
   components: {
     FormPost,
+    FormComment,
+    FormEdit,
     Loader,
   },
   data() {
@@ -295,92 +299,25 @@ export default {
                     </div>
                   </div>
 
-                  <!-- create post -->
-                  <form v-if="isComment" class="mt-5">
-                    <div class="is-flex is-flex-direction-column" style="gap: 10px">
-                      <label for="authorName">Author Name</label>
-                      <input
-                        type="text"
-                        class="input"
-                        id="authorName"
-                        v-model="authorName"
-                        name="authorName"
-                        placeholder="Name Surname"
-                      />
-
-                      <label for="authorEmail">Author Email</label>
-                      <input
-                        type="email"
-                        placeholder="Your Email"
-                        id="authorEmail"
-                        class="input"
-                        v-model="authorEmail"
-                        required
-                      />
-
-                      <label for="postComment">Write Post Body</label>
-                      <textarea
-                        class="textarea"
-                        name="postMessage"
-                        id="postMessage"
-                        placeholder="Comment"
-                        v-model="postMessage"
-                        required
-                      ></textarea>
-                    </div>
-
-                    <div class="is-hidden">
-                      <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
-                        <i className="fas fa-exclamation-triangle"></i>
-                      </span>
-                      <p className="help is-danger" data-cy="ErrorMessage">error text</p>
-                    </div>
-
-                    <div class="mt-5">
-                      <button class="button is-link" @click="addComment">Add comment</button>&nbsp;
-                      <button class="button is-text" @click="cancelComment">Cancel</button>
-                    </div>
-                  </form>
+                  <!-- create comment -->
+                  <FormComment
+                    v-if="isComment"
+                    :isComment="isComment"
+                    @update:authorName="authorName = $event"
+                    @update:authorEmail="authorEmail = $event"
+                    @update:postMessage="postMessage = $event"
+                    :addComment="addComment"
+                    :cancelComment="cancelComment"
+                  />
 
                   <!-- edit post -->
-                  <form v-if="editForm" class="mt-5" @submit.prevent>
-                    <div class="is-flex is-flex-direction-column" style="gap: 10px">
-                      <label for="editTitle">Post Title</label>
-                      <input
-                        type="text"
-                        class="input"
-                        id="editTitle"
-                        v-model="titleVue"
-                        name="titleVue"
-                        placeholder="Title"
-                      />
-
-                      <label for="editContent">Write Post Body</label>
-                      <textarea
-                        class="textarea"
-                        name="postVue"
-                        id="editContent"
-                        placeholder="Content"
-                        v-model="postVue"
-                        required
-                      ></textarea>
-                    </div>
-
-                    <div class="is-hidden">
-                      <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
-                        <i className="fas fa-exclamation-triangle"></i>
-                      </span>
-                      <p className="help is-danger" data-cy="ErrorMessage">error text</p>
-                    </div>
-
-                    <div class="mt-5">
-                      <button class="button is-link" @click="addEditForm" type="button">Save</button
-                      >&nbsp;
-                      <button class="button is-text" @click="cancelEditForm" type="button">
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
+                  <FormEdit
+                    v-if="editForm"
+                    @update:titleVue="titleVue = $event"
+                    @update:postVue="postVue = $event"
+                    :cancelEditForm="cancelEditForm"
+                    :addEditForm="addEditForm"
+                  />
 
                   <button
                     v-if="!isComment && !editForm"

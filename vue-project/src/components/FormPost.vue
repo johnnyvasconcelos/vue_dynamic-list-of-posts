@@ -1,3 +1,27 @@
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
+
+export default defineComponent({
+  emits: ['update:titleVue', 'update:postVue'],
+
+  props: {
+    storeText: { type: Function as PropType<(payload: Event) => void>, required: true },
+    asideShow: { type: Function as PropType<(payload: MouseEvent) => void>, required: true },
+    titleVue: { type: String, required: true },
+    postVue: { type: String, required: true },
+  },
+
+  methods: {
+    onTitleInput(e: Event) {
+      this.$emit('update:titleVue', (e.target as HTMLInputElement).value)
+    },
+    onPostInput(e: Event) {
+      this.$emit('update:postVue', (e.target as HTMLTextAreaElement).value)
+    },
+  },
+})
+</script>
+
 <template>
   <form @submit="storeText">
     <div class="is-flex is-flex-direction-column" style="gap: 10px">
@@ -36,27 +60,3 @@
     </div>
   </form>
 </template>
-
-<script lang="ts">
-import { defineComponent, type PropType } from 'vue'
-
-export default defineComponent({
-  emits: ['update:titleVue', 'update:postVue'],
-
-  props: {
-    storeText: { type: Function as PropType<(payload: Event) => void>, required: true },
-    asideShow: { type: Function as PropType<(payload: MouseEvent) => void>, required: true },
-    titleVue: { type: String, required: true },
-    postVue: { type: String, required: true },
-  },
-
-  methods: {
-    onTitleInput(e: Event) {
-      this.$emit('update:titleVue', (e.target as HTMLInputElement).value)
-    },
-    onPostInput(e: Event) {
-      this.$emit('update:postVue', (e.target as HTMLTextAreaElement).value)
-    },
-  },
-})
-</script>
