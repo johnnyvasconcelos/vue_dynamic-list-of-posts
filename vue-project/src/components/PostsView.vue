@@ -94,8 +94,22 @@ export default {
       window.location.reload()
     },
     editItem() {
+      const post = this.posts.find((p) => p.id === this.selectedPost)
+      if (post) {
+        this.titleVue = post.title
+        this.postVue = post.text
+      }
       this.editForm = true
       this.isComment = false
+    },
+    addEditForm() {
+      const post = this.posts.find((p) => p.id === this.selectedPost)
+      if (post) {
+        post.title = this.titleVue
+        post.text = this.postVue
+      }
+      this.editForm = false
+      localStorage.setItem('postsVue', JSON.stringify(this.posts))
     },
     showCommentForm() {
       this.isComment = true
@@ -329,35 +343,25 @@ export default {
                   </form>
 
                   <!-- edit post -->
-                  <form v-if="editForm" class="mt-5">
+                  <form v-if="editForm" class="mt-5" @submit.prevent>
                     <div class="is-flex is-flex-direction-column" style="gap: 10px">
-                      <label for="authorName">Author Name</label>
+                      <label for="editTitle">Post Title</label>
                       <input
                         type="text"
                         class="input"
-                        id="authorName"
-                        v-model="authorName"
-                        name="authorName"
-                        placeholder="Name Surname"
+                        id="editTitle"
+                        v-model="titleVue"
+                        name="titleVue"
+                        placeholder="Title"
                       />
 
-                      <label for="authorEmail">Author Email</label>
-                      <input
-                        type="email"
-                        placeholder="Your Email"
-                        id="authorEmail"
-                        class="input"
-                        v-model="authorEmail"
-                        required
-                      />
-
-                      <label for="postComment">Write Post Body</label>
+                      <label for="editContent">Write Post Body</label>
                       <textarea
                         class="textarea"
-                        name="postMessage"
-                        id="postMessage"
-                        placeholder="Comment"
-                        v-model="postMessage"
+                        name="postVue"
+                        id="editContent"
+                        placeholder="Content"
+                        v-model="postVue"
                         required
                       ></textarea>
                     </div>
@@ -370,7 +374,8 @@ export default {
                     </div>
 
                     <div class="mt-5">
-                      <button class="button is-link" @click="addComment">Add comment</button>&nbsp;
+                      <button class="button is-link" @click="addEditForm" type="button">Save</button
+                      >&nbsp;
                       <button class="button is-text" @click="cancelEditForm" type="button">
                         Cancel
                       </button>
