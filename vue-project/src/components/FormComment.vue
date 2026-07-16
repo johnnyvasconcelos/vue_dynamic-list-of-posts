@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { PropType } from 'vue'
+
 export default {
+  emits: ['update:authorName', 'update:authorEmail', 'update:postMessage'],
   props: {
     isComment: {
       type: Boolean,
@@ -21,6 +23,17 @@ export default {
       type: Function as PropType<() => void>,
     },
   },
+  methods: {
+    onNameInput(e: Event) {
+      this.$emit('update:authorName', (e.target as HTMLInputElement).value)
+    },
+    onEmailInput(e: Event) {
+      this.$emit('update:authorEmail', (e.target as HTMLInputElement).value)
+    },
+    onMessageInput(e: Event) {
+      this.$emit('update:postMessage', (e.target as HTMLTextAreaElement).value)
+    },
+  },
 }
 </script>
 <template>
@@ -32,6 +45,7 @@ export default {
         class="input"
         id="authorName"
         :value="authorName"
+        @input="onNameInput"
         name="authorName"
         placeholder="Name Surname"
       />
@@ -43,6 +57,7 @@ export default {
         id="authorEmail"
         class="input"
         :value="authorEmail"
+        @input="onEmailInput"
         required
       />
 
@@ -53,6 +68,7 @@ export default {
         id="postMessage"
         placeholder="Comment"
         :value="postMessage"
+        @input="onMessageInput"
         required
       ></textarea>
     </div>

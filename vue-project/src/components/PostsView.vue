@@ -73,19 +73,22 @@ export default {
       localStorage.setItem('postsVue', JSON.stringify(this.posts))
     },
     showPost(id: number) {
-      // console.log(id)
+      //console.log(id)
       if (this.showAside && this.selectedPost === id) {
         this.showAside = false
         this.postSelected = false
+        this.editForm = false
       } else {
         this.selectedPost = id
         this.showAside = true
         this.postSelected = true
+        this.editForm = false
         this.isLoading = true
         setTimeout(() => {
           this.isLoading = false
         }, 2000)
       }
+      this.editForm = false
     },
     deleteItem() {
       const post = this.posts.find((item) => {
@@ -313,6 +316,8 @@ export default {
                   <!-- edit post -->
                   <FormEdit
                     v-if="editForm"
+                    :titleVue="titleVue"
+                    :postVue="postVue"
                     @update:titleVue="titleVue = $event"
                     @update:postVue="postVue = $event"
                     :cancelEditForm="cancelEditForm"

@@ -1,6 +1,9 @@
 <script lang="ts">
-import type { PropType } from 'vue'
-export default {
+import { defineComponent, type PropType } from 'vue'
+
+export default defineComponent({
+  emits: ['update:titleVue', 'update:postVue'],
+
   props: {
     titleVue: {
       type: String,
@@ -15,11 +18,20 @@ export default {
       type: Function as PropType<() => void>,
     },
   },
-}
+
+  methods: {
+    onTitleInput(e: Event) {
+      this.$emit('update:titleVue', (e.target as HTMLInputElement).value)
+    },
+    onPostInput(e: Event) {
+      this.$emit('update:postVue', (e.target as HTMLTextAreaElement).value)
+    },
+  },
+})
 </script>
 
 <template>
-  <form class="mt-5" @submit.prevent>
+  <form class="mt-5">
     <div class="is-flex is-flex-direction-column" style="gap: 10px">
       <label for="editTitle">Post Title</label>
       <input
@@ -27,6 +39,7 @@ export default {
         class="input"
         id="editTitle"
         :value="titleVue"
+        @input="onTitleInput"
         name="titleVue"
         placeholder="Title"
       />
@@ -38,15 +51,16 @@ export default {
         id="editContent"
         placeholder="Content"
         :value="postVue"
+        @input="onPostInput"
         required
       ></textarea>
     </div>
 
     <div class="is-hidden">
-      <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
-        <i className="fas fa-exclamation-triangle"></i>
+      <span class="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+        <i class="fas fa-exclamation-triangle"></i>
       </span>
-      <p className="help is-danger" data-cy="ErrorMessage">error text</p>
+      <p class="help is-danger" data-cy="ErrorMessage">error text</p>
     </div>
 
     <div class="mt-5">
