@@ -1,5 +1,9 @@
 <script lang="ts">
+import FormPost from './FormPost.vue'
 export default {
+  components: {
+    FormPost,
+  },
   data() {
     const localPosts = localStorage.getItem('postsVue')
     const localComments = localStorage.getItem('commentsVue')
@@ -113,190 +117,185 @@ export default {
   <div class="tile is-parent">
     <div class="tile is-child box is-success">
       <div class="block">
-        <div class="block is-flex is-justify-content-space-between">
-          <p class="subtitle">Vue List of Posts</p>
-          <div class="is-flex is-align-items-center is-justify-content-space-between">
-            <p>User: {{ user }}</p>
-            &nbsp;&nbsp;
-            <button type="button" class="button is-text" @click="logout">Logout</button>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+          <div class="navbar-item">
+            <h2 class="is-size-4">Vue List Of Posts</h2>
           </div>
-        </div>
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="buttons">
+                <div class="mr-5 mb-2">
+                  <p>User: {{ user }}</p>
+                </div>
 
-        <div class="is-flex">
-          <div class="is-flex-grow-1">
-            <div class="block is-flex is-justify-content-space-between">
-              <p class="title">Posts</p>
-              <button type="button" class="button is-link" @click="asideShow">Add New Post</button>
+                <a class="button is-light" @click="logout"> Logout </a>
+              </div>
             </div>
-
-            <table
-              class="table is-fullwidth is-striped is-hoverable is-narrow"
-              v-if="posts.length > 0"
-            >
-              <thead>
-                <tr class="has-background-link-light">
-                  <th>ID</th>
-                  <th>Title</th>
-                  <th class="has-text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="post in posts" :key="post.id">
-                  <td>{{ post.id }}</td>
-                  <td>{{ post.title }}</td>
-                  <td class="has-text-right is-vcentered">
-                    <button
-                      type="button"
-                      :class="
-                        showAside && selectedPost === post.id ? 'button is-text' : 'button is-link'
-                      "
-                      @click="showPost(post.id)"
-                    >
-                      {{ showAside && selectedPost === post.id ? 'Close' : 'Open' }}
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <p class="has-text-centered" v-else>No posts yet.</p>
           </div>
+        </nav>
 
-          <div
-            v-if="!postSelected"
-            class="is-flex is-flex-direction-column"
-            :style="{
-              width: showAside ? '500px' : '0px',
-              height: showAside ? 'auto' : '0px',
-              minWidth: showAside ? '500px' : '0px',
-              marginLeft: showAside ? '1.5rem' : '0px',
-              paddingLeft: showAside ? '20px' : '0px',
-              gap: showAside ? '15px' : '0px',
-              overflow: 'hidden',
-              transition: '0.4s',
-            }"
-          >
-            <h2>Create new posts</h2>
-
-            <form @submit="storeText">
-              <div class="is-flex is-flex-direction-column" style="gap: 10px">
-                <label for="titleVue">Title </label>
-                <input
-                  type="text"
-                  name="titleVue"
-                  id="titleVue"
-                  placeholder="Post Title"
-                  class="input"
-                  v-model="titleVue"
-                  required
-                />
-                <label for="postVue">Write Post Body</label>
-                <textarea
-                  class="textarea"
-                  placeholder="Post body"
-                  id="postVue"
-                  name="postVue"
-                  v-model="postVue"
-                  required
-                ></textarea>
-              </div>
-              <div class="field is-grouped mt-5">
-                <div class="control">
-                  <button type="submit" class="button is-link">Create</button>
-                </div>
-                <div class="control">
-                  <button type="button" class="button is-link is-light" @click="asideShow">
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div
-            v-else
-            :style="{
-              width: showAside ? '500px' : '0px',
-              height: showAside ? 'auto' : '0px',
-              minWidth: showAside ? '500px' : '0px',
-              marginLeft: showAside ? '1.5rem' : '0px',
-              paddingLeft: showAside ? '20px' : '0px',
-              gap: showAside ? '15px' : '0px',
-              overflow: 'hidden',
-              transition: '0.4s',
-            }"
-          >
-            <div class="is-flex is-justify-content-space-between is-align-items-center">
-              <h2 class="title">
-                #{{ posts.find((post) => post.id === selectedPost)?.id }}:
-                {{ posts.find((post) => post.id === selectedPost)?.title }}
-              </h2>
-              <div>
-                <button type="button" @click="deleteItem">
-                  <i class="fa fa-trash has-text-danger"></i>
+        <div class="tile is-parent">
+          <div class="tile is-child box is-success">
+            <div class="block">
+              <div class="block is-flex is-justify-content-space-between">
+                <p class="title">Posts</p>
+                <button type="button" class="button is-link" @click="asideShow">
+                  Add New Post
                 </button>
               </div>
-            </div>
-            <p>{{ posts.find((post) => post.id === selectedPost)?.text }}</p>
-            <div v-if="comments.length > 0"></div>
-            <div v-if="comments.length == 0">
-              <h2 class="mt-5 title">No comments yet</h2>
-            </div>
-            <div v-if="comments.length > 0 && !isComment" class="mt-5">
-              <article
-                class="is-small mt-3"
-                v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
-                :key="comment.postId"
+
+              <table
+                class="table is-fullwidth is-striped is-hoverable is-narrow"
+                v-if="posts.length > 0"
               >
-                <div class="is-flex is-justify-content-space-between">
-                  <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
-                  <button
-                    type="button"
-                    class="button is-small is-text has-text-danger"
-                    @click="deletePost(comment.postId)"
-                  >
-                    <i class="fa fa-close"></i>
+                <thead>
+                  <tr class="has-background-link-light">
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th class="has-text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="post in posts" :key="post.id">
+                    <td>{{ post.id }}</td>
+                    <td>{{ post.title }}</td>
+                    <td class="has-text-right is-vcentered">
+                      <button
+                        type="button"
+                        :class="
+                          showAside && selectedPost === post.id
+                            ? 'button is-text'
+                            : 'button is-link'
+                        "
+                        @click="showPost(post.id)"
+                      >
+                        {{ showAside && selectedPost === post.id ? 'Close' : 'Open' }}
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="has-text-centered" v-else>No posts yet.</p>
+            </div>
+
+            <div
+              v-if="!postSelected"
+              class="is-flex is-flex-direction-column"
+              :style="{
+                width: showAside ? '500px' : '0px',
+                height: showAside ? 'auto' : '0px',
+                minWidth: showAside ? '500px' : '0px',
+                marginLeft: showAside ? '1.5rem' : '0px',
+                paddingLeft: showAside ? '20px' : '0px',
+                gap: showAside ? '15px' : '0px',
+                overflow: 'hidden',
+                transition: '0.4s',
+              }"
+            >
+              <h2>Create new posts</h2>
+
+              <FormPost
+                :storeText="storeText"
+                :asideShow="asideShow"
+                :titleVue="titleVue"
+                :postVue="postVue"
+                @update:titleVue="titleVue = $event"
+                @update:postVue="postVue = $event"
+              />
+            </div>
+            <div
+              v-else
+              :style="{
+                width: showAside ? '500px' : '0px',
+                height: showAside ? 'auto' : '0px',
+                minWidth: showAside ? '500px' : '0px',
+                marginLeft: showAside ? '1.5rem' : '0px',
+                paddingLeft: showAside ? '20px' : '0px',
+                gap: showAside ? '15px' : '0px',
+                overflow: 'hidden',
+                transition: '0.4s',
+              }"
+            >
+              <div class="is-flex is-justify-content-space-between is-align-items-center">
+                <h2 class="title">
+                  #{{ posts.find((post) => post.id === selectedPost)?.id }}:
+                  {{ posts.find((post) => post.id === selectedPost)?.title }}
+                </h2>
+                <div>
+                  <button type="button" @click="deleteItem">
+                    <i class="fa fa-trash has-text-danger"></i>
                   </button>
                 </div>
-                <div>{{ comment.message }}</div>
-              </article>
+              </div>
+              <p>{{ posts.find((post) => post.id === selectedPost)?.text }}</p>
+              <div v-if="comments.length > 0"></div>
+              <div v-if="comments.length == 0">
+                <h2 class="mt-5 title">No comments yet</h2>
+              </div>
+              <div v-if="comments.length > 0 && !isComment" class="mt-5">
+                <article
+                  class="is-small message mt-3"
+                  v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
+                  :key="comment.postId"
+                >
+                  <div class="is-flex is-justify-content-space-between">
+                    <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
+                    <button
+                      type="button"
+                      class="button is-small is-text has-text-danger"
+                      @click="deletePost(comment.postId)"
+                    >
+                      <i class="fa fa-close"></i>
+                    </button>
+                  </div>
+                  <div>{{ comment.message }}</div>
+                </article>
+              </div>
+              <form v-if="isComment" class="mt-5">
+                <div class="is-flex is-flex-direction-column" style="gap: 10px">
+                  <label for="authorName">Author Name</label>
+                  <input
+                    type="text"
+                    class="input"
+                    id="authorName"
+                    v-model="authorName"
+                    name="authorName"
+                    placeholder="Name Surname"
+                  />
+                  <label for="authorEmail">Author Email</label>
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    id="authorEmail"
+                    class="input"
+                    v-model="authorEmail"
+                    required
+                  />
+                  <label for="postComment">Write Post Body</label>
+                  <textarea
+                    class="textarea"
+                    name="postMessage"
+                    id="postMessage"
+                    placeholder="Comment"
+                    v-model="postMessage"
+                    required
+                  ></textarea>
+                </div>
+                <div class="is-hidden">
+                  <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+                    <i className="fas fa-exclamation-triangle"></i>
+                  </span>
+                  <p className="help is-danger" data-cy="ErrorMessage">error text</p>
+                </div>
+                <div class="mt-5">
+                  <button class="button is-link" @click="addComment">Add comment</button>&nbsp;
+                  <button class="button is-text" @click="cancelComment">Cancel</button>
+                </div>
+              </form>
+              <button v-if="!isComment" class="mt-5 button is-link" @click="showCommentForm">
+                Write a comment
+              </button>
             </div>
-            <form v-if="isComment" class="mt-5">
-              <div class="is-flex is-flex-direction-column" style="gap: 10px">
-                <label for="authorName">Author Name</label>
-                <input
-                  type="text"
-                  class="input"
-                  id="authorName"
-                  v-model="authorName"
-                  name="authorName"
-                  placeholder="Name Surname"
-                />
-                <label for="authorEmail">Author Email</label>
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  id="authorEmail"
-                  class="input"
-                  v-model="authorEmail"
-                  required
-                />
-                <label for="postComment">Write Post Body</label>
-                <textarea
-                  class="textarea"
-                  name="postMessage"
-                  id="postMessage"
-                  placeholder="Comment"
-                  v-model="postMessage"
-                  required
-                ></textarea>
-              </div>
-              <div class="mt-5">
-                <button class="button is-link" @click="addComment">Add comment</button>&nbsp;
-                <button class="button is-text" @click="cancelComment">Cancel</button>
-              </div>
-            </form>
-            <button v-if="!isComment" class="mt-5 button is-link" @click="showCommentForm">
-              Write a comment
-            </button>
           </div>
         </div>
       </div>
