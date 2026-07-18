@@ -14,24 +14,8 @@ export default {
     const localPosts = localStorage.getItem('postsVue')
     const localComments = localStorage.getItem('commentsVue')
     return {
-      posts: localPosts
-        ? (JSON.parse(localPosts) as { title: string; text: string; id: number }[])
-        : [],
-      comments: localComments
-        ? (JSON.parse(localComments) as {
-            author: string
-            email: string
-            authorId: number | null
-            postId: number
-            message: string
-          }[])
-        : ([] as {
-            author: string
-            email: string
-            authorId: number | null
-            postId: number
-            message: string
-          }[]),
+      posts: [],
+      comments: [],
       user: localStorage.getItem('nameVue'),
       showAside: false,
       titleVue: '',
@@ -65,15 +49,26 @@ export default {
       this.editForm = false
     },
     storeText() {
-      this.posts.push({
+      const newPost = {
         title: this.titleVue,
-        text: this.postVue,
-        id: (this.number += 1),
+        body: this.postVue,
+        userId: 3123,
+      }
+      fetch('https://mate.academy/students-api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(newPost),
       })
-      localStorage.setItem('postsVue', JSON.stringify(this.posts))
+        .then((response) => response.json())
+        .then((post) => {
+          this.posts.push(post)
+          this.asideShow()
+        })
+        .catch((err) => console.error('Erro ao criar post:', err))
     },
     showPost(id: number) {
-      //console.log(id)
       if (this.showAside && this.selectedPost === id) {
         this.showAside = false
         this.postSelected = false
@@ -84,9 +79,20 @@ export default {
         this.postSelected = true
         this.editForm = false
         this.isLoading = true
-        setTimeout(() => {
-          this.isLoading = false
-        }, 2000)
+        fetch('https://mate.academy/students-api/comments')
+          .then((response) => {
+            if (!response.ok) throw new Error('Erro')
+            return response.json()
+          })
+          .then((allComments) => {
+            this.comments = allComments.filter((c: any) => c.postId === id)
+          })
+          .catch((error) => {
+            console.error('Erro:', error)
+          })
+          .finally(() => {
+            this.isLoading = false
+          })
       }
       this.editForm = false
     },
@@ -97,26 +103,55 @@ export default {
       this.posts = this.posts.filter((item) => {
         return item !== post
       })
-      localStorage.setItem('postsVue', JSON.stringify(this.posts))
-      window.location.reload()
+      fetch(`https://mate.academy/students-api/posts/${this.selectedPost}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(post),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          this.isLoadingLoad = true
+          setTimeout(() => {
+            this.isLoadingLoad = false
+          }, 2000)
+          this.showAside = false
+        })
+        .catch((error) => {
+          console.error('Erro:', error)
+        })
     },
     editItem() {
       const post = this.posts.find((p) => p.id === this.selectedPost)
       if (post) {
         this.titleVue = post.title
-        this.postVue = post.text
+        this.postVue = post.body
       }
       this.editForm = true
       this.isComment = false
     },
     addEditForm() {
-      const post = this.posts.find((p) => p.id === this.selectedPost)
-      if (post) {
-        post.title = this.titleVue
-        post.text = this.postVue
+      const newPost = {
+        title: this.titleVue,
+        body: this.postVue,
+        userId: 1,
       }
-      this.editForm = false
-      localStorage.setItem('postsVue', JSON.stringify(this.posts))
+      fetch(`https://mate.academy/students-api/posts/${this.selectedPost}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(newPost),
+      })
+        .then((response) => response.json())
+        .then((post) => {
+          const postToEdit = this.posts.find((p) => p.id === this.selectedPost)
+          postToEdit.title = post.title
+          postToEdit.body = post.body
+          this.editForm = false
+        })
+        .catch((err) => console.error('Erro:', err))
     },
     showCommentForm() {
       this.isComment = true
@@ -151,9 +186,45 @@ export default {
     },
   },
   created() {
+    /*
     setTimeout(() => {
       this.isLoadingLoad = false
     }, 2000)
+ */
+    this.isLoadingLoad = true
+    fetch('https://mate.academy/students-api/posts')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erro')
+        }
+        return response.json()
+      })
+      .then((dados) => {
+        this.posts = dados
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+      .finally(() => {
+        this.isLoadingLoad = false
+      })
+
+    fetch('https://mate.academy/students-api/comments')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erro')
+        }
+        return response.json()
+      })
+      .then((dados) => {
+        this.comments = dados
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+      .finally(() => {
+        this.isLoadingLoad = false
+      })
   },
 }
 </script>
@@ -271,7 +342,7 @@ export default {
                     </div>
                   </div>
 
-                  <p>{{ posts.find((post) => post.id === selectedPost)?.text }}</p>
+                  <p>{{ posts.find((post) => post.id === selectedPost)?.body }}</p>
 
                   <div v-if="comments.length > 0"></div>
                   <div v-if="comments.length == 0">
@@ -284,11 +355,11 @@ export default {
                     <div v-if="comments.length > 0 && !isComment && !editForm" class="mt-5">
                       <article
                         class="is-small message mt-3"
-                        v-for="comment in comments.filter((c) => c.authorId === selectedPost)"
-                        :key="comment.postId"
+                        v-for="comment in comments.filter((c) => c.postId === selectedPost)"
+                        :key="comment.id"
                       >
                         <div class="is-flex is-justify-content-space-between">
-                          <a :href="`mailto:${comment.email}`">{{ comment.author }}</a>
+                          <a :href="`mailto:${comment.email}`">{{ comment.email }}</a>
                           <button
                             type="button"
                             class="button is-small is-text has-text-danger"
@@ -302,7 +373,7 @@ export default {
                     </div>
                   </div>
 
-                  <!-- create comment -->
+                  <!-- add a comment -->
                   <FormComment
                     v-if="isComment"
                     :isComment="isComment"
