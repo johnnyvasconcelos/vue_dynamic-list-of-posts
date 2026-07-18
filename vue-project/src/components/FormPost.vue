@@ -5,10 +5,12 @@ export default defineComponent({
   emits: ['update:titleVue', 'update:postVue'],
 
   props: {
-    storeText: { type: Function as PropType<(payload: Event) => void>, required: true },
-    asideShow: { type: Function as PropType<(payload: MouseEvent) => void>, required: true },
-    titleVue: { type: String, required: true },
-    postVue: { type: String, required: true },
+    storeText: { type: Function as PropType<(payload: Event) => void> },
+    asideShow: { type: Function as PropType<(payload: MouseEvent) => void> },
+    titleVue: { type: String },
+    postVue: { type: String },
+    err: { type: String },
+    isError: { type: Boolean },
   },
 
   methods: {
@@ -47,6 +49,13 @@ export default defineComponent({
         @input="onPostInput"
         required
       ></textarea>
+    </div>
+
+    <div v-if="isError">
+      <span class="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </span>
+      <p class="help is-danger" data-cy="ErrorMessage">{{ err }}</p>
     </div>
 
     <div class="field is-grouped mt-5">

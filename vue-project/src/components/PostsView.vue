@@ -31,6 +31,8 @@ export default {
       isLoading: false,
       isLoadingLoad: true,
       editForm: false,
+      err: '',
+      isError: false,
     }
   },
   methods: {
@@ -66,7 +68,7 @@ export default {
           this.posts.push(post)
           this.asideShow()
         })
-        .catch((error) => console.error('Erro:', error))
+        .catch((error) => (this.err = error))
     },
     showPost(id: number) {
       if (this.showAside && this.selectedPost === id) {
@@ -88,7 +90,7 @@ export default {
             this.comments = allComments.filter((c) => c.postId === id)
           })
           .catch((error) => {
-            console.error('Erro:', error)
+            this.err = error
           })
           .finally(() => {
             this.isLoading = false
@@ -119,7 +121,7 @@ export default {
           this.showAside = false
         })
         .catch((error) => {
-          console.error('Erro:', error)
+          this.err = error
         })
     },
     editItem() {
@@ -151,7 +153,7 @@ export default {
           postToEdit.body = post.body
           this.editForm = false
         })
-        .catch((error) => console.error('Erro:', error))
+        .catch((error) => (this.err = error))
     },
     showCommentForm() {
       this.isComment = true
@@ -189,7 +191,7 @@ export default {
           this.postMessage = ''
           this.isLoading = false
         })
-        .catch((error) => console.error('Erro:', error))
+        .catch((error) => (this.err = error))
     },
     deletePost(commentId: number) {
       const comment = this.comments.find((item) => item.id === commentId)
@@ -211,7 +213,7 @@ export default {
           this.showAside = false
         })
         .catch((error) => {
-          console.error('Erro:', error)
+          this.err = error
         })
     },
   },
@@ -233,7 +235,7 @@ export default {
         this.posts = dados
       })
       .catch((error) => {
-        console.error(error)
+        this.err = error
       })
       .finally(() => {
         this.isLoadingLoad = false
@@ -250,7 +252,7 @@ export default {
         this.comments = dados
       })
       .catch((error) => {
-        console.error(error)
+        this.err = error
       })
       .finally(() => {
         this.isLoadingLoad = false
@@ -349,6 +351,8 @@ export default {
                     :storeText="storeText"
                     :asideShow="asideShow"
                     :titleVue="titleVue"
+                    :err="err"
+                    :isError="isError"
                     :postVue="postVue"
                     @update:titleVue="titleVue = $event"
                     @update:postVue="postVue = $event"
@@ -412,6 +416,8 @@ export default {
                     @update:postMessage="postMessage = $event"
                     :addComment="addComment"
                     :cancelComment="cancelComment"
+                    :err="err"
+                    :isError="isError"
                   />
 
                   <!-- edit post -->
@@ -423,6 +429,8 @@ export default {
                     @update:postVue="postVue = $event"
                     :cancelEditForm="cancelEditForm"
                     :addEditForm="addEditForm"
+                    :err="err"
+                    :isError="isError"
                   />
 
                   <button

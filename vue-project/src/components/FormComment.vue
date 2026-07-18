@@ -22,6 +22,8 @@ export default {
     cancelComment: {
       type: Function as PropType<() => void>,
     },
+    err: { type: String },
+    isError: { type: Boolean },
   },
   methods: {
     onNameInput(e: Event) {
@@ -73,11 +75,11 @@ export default {
       ></textarea>
     </div>
 
-    <div class="is-hidden">
-      <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
-        <i className="fas fa-exclamation-triangle"></i>
+    <div v-if="isError">
+      <span class="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+        <i class="fas fa-exclamation-triangle"></i>
       </span>
-      <p className="help is-danger" data-cy="ErrorMessage">error text</p>
+      <p class="help is-danger" data-cy="ErrorMessage">{{ err }}</p>
     </div>
 
     <div class="mt-5">

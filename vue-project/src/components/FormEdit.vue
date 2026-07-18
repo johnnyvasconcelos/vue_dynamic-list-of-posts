@@ -8,15 +8,15 @@ export default defineComponent({
     titleVue: {
       type: String,
     },
-    postVue: {
-      type: String,
-    },
+    postVue: { type: String },
     addEditForm: {
       type: Function as PropType<() => void>,
     },
     cancelEditForm: {
       type: Function as PropType<() => void>,
     },
+    err: { type: String },
+    isError: { type: Boolean },
   },
 
   methods: {
@@ -56,11 +56,11 @@ export default defineComponent({
       ></textarea>
     </div>
 
-    <div class="is-hidden">
+    <div v-if="isError">
       <span class="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
         <i class="fas fa-exclamation-triangle"></i>
       </span>
-      <p class="help is-danger" data-cy="ErrorMessage">error text</p>
+      <p class="help is-danger" data-cy="ErrorMessage">{{ err }}</p>
     </div>
 
     <div class="mt-5">
