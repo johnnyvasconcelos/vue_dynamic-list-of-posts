@@ -66,7 +66,7 @@ export default {
           this.posts.push(post)
           this.asideShow()
         })
-        .catch((err) => console.error('Erro ao criar post:', err))
+        .catch((error) => console.error('Erro:', error))
     },
     showPost(id: number) {
       if (this.showAside && this.selectedPost === id) {
@@ -85,7 +85,7 @@ export default {
             return response.json()
           })
           .then((allComments) => {
-            this.comments = allComments.filter((c: any) => c.postId === id)
+            this.comments = allComments.filter((c) => c.postId === id)
           })
           .catch((error) => {
             console.error('Erro:', error)
@@ -151,7 +151,7 @@ export default {
           postToEdit.body = post.body
           this.editForm = false
         })
-        .catch((err) => console.error('Erro:', err))
+        .catch((error) => console.error('Erro:', error))
     },
     showCommentForm() {
       this.isComment = true
@@ -166,23 +166,53 @@ export default {
       this.editForm = false
     },
     addComment() {
-      this.comments.push({
-        author: this.authorName,
-        authorId: this.selectedPost,
-        postId: (this.ID += 1),
+      this.isLoading = true
+      const newComment = {
+        postId: this.selectedPost,
+        body: this.postMessage,
+        name: this.authorName,
         email: this.authorEmail,
-        message: this.postMessage,
+      }
+      //console.log(newComment)
+      fetch('https://mate.academy/students-api/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(newComment),
       })
-      this.isComment = false
-      this.editForm = false
-      localStorage.setItem('commentsVue', JSON.stringify(this.comments))
-      this.postMessage = ''
+        .then((response) => response.json())
+        .then((comment) => {
+          this.comments.push(comment)
+          this.isComment = false
+          this.editForm = false
+          this.postMessage = ''
+          this.isLoading = false
+        })
+        .catch((error) => console.error('Erro:', error))
     },
     deletePost(commentId: number) {
-      this.comments = this.comments.filter((c) => {
-        return c.postId !== commentId
+      const comment = this.comments.find((item) => item.id === commentId)
+      this.comments = this.comments.filter((item) => item.id !== commentId)
+
+      fetch(`https://mate.academy/students-api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(comment),
       })
-      localStorage.setItem('commentsVue', JSON.stringify(this.comments))
+        .then((response) => response.json())
+        .then(() => {
+          this.isLoadingLoad = true
+          setTimeout(() => {
+            this.isLoadingLoad = false
+          }, 2000)
+          this.showAside = false
+        })
+        .catch((error) => {
+          console.error('Erro:', error)
+        })
     },
   },
   created() {
@@ -363,12 +393,12 @@ export default {
                           <button
                             type="button"
                             class="button is-small is-text has-text-danger"
-                            @click="deletePost(comment.postId)"
+                            @click="deletePost(comment.id)"
                           >
                             <i class="fa fa-close"></i>
                           </button>
                         </div>
-                        <div>{{ comment.message }}</div>
+                        <div>{{ comment.body }}</div>
                       </article>
                     </div>
                   </div>

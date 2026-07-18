@@ -37,7 +37,7 @@ export default {
 }
 </script>
 <template>
-  <form class="mt-5">
+  <form class="mt-5" @submit="addComment">
     <div class="is-flex is-flex-direction-column" style="gap: 10px">
       <label for="authorName">Author Name</label>
       <input
@@ -81,8 +81,8 @@ export default {
     </div>
 
     <div class="mt-5">
-      <button class="button is-link" @click="addComment">Add comment</button>
-      <button class="button is-text" @click="cancelComment">Cancel</button>
+      <button class="button is-link">Add comment</button>
+      <button class="button is-text" type="button" @click="cancelComment">Cancel</button>
     </div>
   </form>
 </template>
