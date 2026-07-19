@@ -16,6 +16,9 @@ export default {
     postMessage: {
       type: String,
     },
+    isLoading: {
+      type: Boolean,
+    },
     addComment: {
       type: Function as PropType<() => void>,
     },
@@ -39,7 +42,7 @@ export default {
 }
 </script>
 <template>
-  <form class="mt-5" @submit="addComment">
+  <form class="mt-5" @submit.prevent="addComment">
     <div class="is-flex is-flex-direction-column" style="gap: 10px">
       <label for="authorName">Author Name</label>
       <input
@@ -50,6 +53,7 @@ export default {
         @input="onNameInput"
         name="authorName"
         placeholder="Name Surname"
+        required
       />
 
       <label for="authorEmail">Author Email</label>
@@ -83,7 +87,9 @@ export default {
     </div>
 
     <div class="mt-5">
-      <button class="button is-link">Add comment</button>
+      <button class="button is-link" type="submit" :class="isLoading ? 'is-loading' : ''">
+        Add comment
+      </button>
       <button class="button is-text" type="button" @click="cancelComment">Cancel</button>
     </div>
   </form>

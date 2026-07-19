@@ -11,6 +11,7 @@ export default defineComponent({
     postVue: { type: String },
     err: { type: String },
     isError: { type: Boolean },
+    isLoading: { type: Boolean },
   },
 
   methods: {
@@ -25,7 +26,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <form @submit="storeText">
+  <form @submit.prevent="storeText">
     <div class="is-flex is-flex-direction-column" style="gap: 10px">
       <label for="titleVue">Title</label>
 
@@ -60,7 +61,9 @@ export default defineComponent({
 
     <div class="field is-grouped mt-5">
       <div class="control">
-        <button type="submit" class="button is-link">Create</button>
+        <button type="submit" class="button is-link" :class="isLoading ? 'is-loading' : ''">
+          Create
+        </button>
       </div>
 
       <div class="control">

@@ -32,7 +32,7 @@ export default {
             name: this.name,
             email: this.email,
           }
-          fetch('https://mate.academy/students-api/users', {
+          fetch('https://mate-academy.github.io/fe-students-api/users', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json; charset=UTF-8',
@@ -55,7 +55,7 @@ export default {
   },
   async mounted() {
     try {
-      const dado = await fetch('https://mate.academy/students-api/users')
+      const dado = await fetch('https://mate-academy.github.io/fe-students-api/users')
       this.dados = await dado.json()
     } catch (error) {
       this.isError = true
@@ -116,7 +116,9 @@ export default {
       </div>
 
       <div class="field">
-        <button type="submit" class="button is-primary">Login</button>
+        <button type="submit" class="button is-primary" :class="isLoading ? 'is-loading' : ''">
+          Login
+        </button>
       </div>
     </form>
     <Loader v-else />

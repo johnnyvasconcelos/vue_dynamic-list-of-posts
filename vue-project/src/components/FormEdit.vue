@@ -8,6 +8,9 @@ export default defineComponent({
     titleVue: {
       type: String,
     },
+    isLoading: {
+      type: Boolean,
+    },
     postVue: { type: String },
     addEditForm: {
       type: Function as PropType<() => void>,
@@ -42,6 +45,7 @@ export default defineComponent({
         @input="onTitleInput"
         name="titleVue"
         placeholder="Title"
+        required
       />
 
       <label for="editContent">Write Post Body</label>
@@ -64,7 +68,14 @@ export default defineComponent({
     </div>
 
     <div class="mt-5">
-      <button class="button is-link" @click="addEditForm" type="button">Save</button>&nbsp;
+      <button
+        class="button is-link"
+        @click="addEditForm"
+        type="button"
+        :class="isLoading ? 'is-loading' : ''"
+      >
+        Save</button
+      >&nbsp;
       <button class="button is-text" @click="cancelEditForm" type="button">Cancel</button>
     </div>
   </form>

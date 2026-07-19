@@ -53,9 +53,9 @@ export default {
       const newPost = {
         title: this.titleVue,
         body: this.postVue,
-        userId: 3123,
+        userId: 1,
       }
-      fetch('https://mate.academy/students-api/posts', {
+      fetch('https://mate-academy.github.io/fe-students-api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -67,7 +67,10 @@ export default {
           this.posts.push(post)
           this.asideShow()
         })
-        .catch((error) => (this.err = error))
+        .catch((error) => {
+          this.err = error
+          this.isError = true
+        })
     },
     showPost(id: number) {
       if (this.showAside && this.selectedPost === id) {
@@ -80,7 +83,7 @@ export default {
         this.postSelected = true
         this.editForm = false
         this.isLoading = true
-        fetch('https://mate.academy/students-api/comments')
+        fetch('https://mate-academy.github.io/fe-students-api/comments')
           .then((response) => {
             if (!response.ok) throw new Error('Erro')
             return response.json()
@@ -90,6 +93,7 @@ export default {
           })
           .catch((error) => {
             this.err = error
+            this.isError = true
           })
           .finally(() => {
             this.isLoading = false
@@ -104,7 +108,7 @@ export default {
       this.posts = this.posts.filter((item) => {
         return item !== post
       })
-      fetch(`https://mate.academy/students-api/posts/${this.selectedPost}`, {
+      fetch(`https://mate-academy.github.io/fe-students-api/${this.selectedPost}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -121,6 +125,7 @@ export default {
         })
         .catch((error) => {
           this.err = error
+          this.isError = true
         })
     },
     editItem() {
@@ -138,7 +143,7 @@ export default {
         body: this.postVue,
         userId: 1,
       }
-      fetch(`https://mate.academy/students-api/posts/${this.selectedPost}`, {
+      fetch(`https://mate-academy.github.io/fe-students-api/${this.selectedPost}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -152,7 +157,10 @@ export default {
           postToEdit.body = post.body
           this.editForm = false
         })
-        .catch((error) => (this.err = error))
+        .catch((error) => {
+          this.err = error
+          this.isError = true
+        })
     },
     showCommentForm() {
       this.isComment = true
@@ -180,7 +188,7 @@ export default {
         email: this.authorEmail,
       }
       //console.log(newComment)
-      fetch('https://mate.academy/students-api/comments', {
+      fetch('https://mate-academy.github.io/fe-students-api/comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -195,13 +203,16 @@ export default {
           this.postMessage = ''
           this.isLoading = false
         })
-        .catch((error) => (this.err = error))
+        .catch((error) => {
+          this.err = error
+          this.isError = true
+        })
     },
     deletePost(commentId: number) {
       const comment = this.comments.find((item) => item.id === commentId)
       this.comments = this.comments.filter((item) => item.id !== commentId)
 
-      fetch(`https://mate.academy/students-api/comments/${commentId}`, {
+      fetch(`https://mate-academy.github.io/fe-students-api/comments/${commentId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -218,6 +229,7 @@ export default {
         })
         .catch((error) => {
           this.err = error
+          this.isError = true
         })
     },
   },
@@ -228,7 +240,7 @@ export default {
     }, 2000)
  */
     this.isLoadingLoad = true
-    fetch('https://mate.academy/students-api/posts')
+    fetch('https://mate-academy.github.io/fe-students-api/posts')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Erro')
@@ -245,7 +257,7 @@ export default {
         this.isLoadingLoad = false
       })
 
-    fetch('https://mate.academy/students-api/comments')
+    fetch('https://mate-academy.github.io/fe-students-api/comments')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Erro')
@@ -257,13 +269,14 @@ export default {
       })
       .catch((error) => {
         this.err = error
+        this.isError = true
       })
       .finally(() => {
         this.isLoadingLoad = false
       })
   },
   async mounted() {
-    fetch('https://mate.academy/students-api/users')
+    fetch('https://mate-academy.github.io/fe-students-api/users')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Erro')
@@ -374,6 +387,7 @@ export default {
                     :storeText="storeText"
                     :asideShow="asideShow"
                     :titleVue="titleVue"
+                    :isLoading="isLoading"
                     :err="err"
                     :isError="isError"
                     :postVue="postVue"
@@ -441,6 +455,7 @@ export default {
                     :cancelComment="cancelComment"
                     :err="err"
                     :isError="isError"
+                    :isLoading="isLoading"
                   />
 
                   <!-- edit post -->
@@ -454,6 +469,7 @@ export default {
                     :addEditForm="addEditForm"
                     :err="err"
                     :isError="isError"
+                    :isLoading="isLoading"
                   />
 
                   <button
