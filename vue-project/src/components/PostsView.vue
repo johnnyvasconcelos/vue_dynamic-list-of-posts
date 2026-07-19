@@ -11,23 +11,23 @@ export default {
     Loader,
   },
   data() {
-    const localPosts = localStorage.getItem('postsVue')
-    const localComments = localStorage.getItem('commentsVue')
     return {
       posts: [],
       comments: [],
-      user: localStorage.getItem('nameVue'),
       showAside: false,
       titleVue: '',
       postVue: '',
-      number: localPosts ? JSON.parse(localPosts).length : 0,
-      ID: localComments ? JSON.parse(localComments).length : 0,
+      number: 0,
+      ID: 0,
+      user: '',
+      userEmail: localStorage.getItem('emLogin'),
       selectedPost: null as number | null,
       postSelected: false,
       isComment: false,
       authorName: '',
       authorEmail: '',
       postMessage: '',
+      emailProp: this.email,
       isLoading: false,
       isLoadingLoad: true,
       editForm: false,
@@ -37,9 +37,8 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem('nameVue')
-      localStorage.removeItem('emailVue')
-      this.user = null
+      localStorage.removeItem('emLogin')
+      this.$emit('logout')
       window.location.reload()
     },
     asideShow() {
@@ -163,6 +162,11 @@ export default {
       this.authorName = ''
       this.authorEmail = ''
       this.postMessage = ''
+      this.clear()
+    },
+    clear() {
+      this.err = ''
+      this.isError = false
     },
     cancelEditForm() {
       this.editForm = false
@@ -253,6 +257,25 @@ export default {
       })
       .catch((error) => {
         this.err = error
+      })
+      .finally(() => {
+        this.isLoadingLoad = false
+      })
+  },
+  async mounted() {
+    fetch('https://mate.academy/students-api/users')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erro')
+        }
+        return response.json()
+      })
+      .then((users) => {
+        const user = users.find((u) => u.email === this.userEmail)
+        this.user = user.name
+      })
+      .catch((error) => {
+        console.log(error)
       })
       .finally(() => {
         this.isLoadingLoad = false

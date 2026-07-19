@@ -8,43 +8,66 @@ export default {
     return {
       email: '',
       name: '',
-      first: true,
+      first: false,
       logged: false,
       isLoading: false,
+      isError: false,
+      err: '',
+      dados: [],
     }
   },
   methods: {
-    handleSubmit() {
-      if (this.first) {
-        if (!this.verification()) {
-          this.first = false
-        } else {
-          this.isLoading = true
-          this.logged = true
-          localStorage.setItem('emailVue', this.email)
-        }
-      } else {
-        this.isLoading = true
+    async submit() {
+      const email = this.dados.find((e) => e.email === this.email)
+      if (email) {
         this.logged = true
-        localStorage.setItem('emailVue', this.email)
-        localStorage.setItem('nameVue', this.name)
-        localStorage.setItem('loggedVue', 'yes')
-
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
+        localStorage.setItem('emLogin', this.email)
+        window.location.reload()
+        return
+      } else {
+        if (!email && this.name === '') {
+          this.first = true
+        } else if (this.name !== '') {
+          const newUser = {
+            name: this.name,
+            email: this.email,
+          }
+          fetch('https://mate.academy/students-api/users', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: JSON.stringify(newUser),
+          })
+            .then((response) => response.json())
+            .then((newUser) => {
+              this.dados.push(newUser)
+              localStorage.setItem('emLogin', this.email)
+              localStorage.setItem('emName', this.name)
+              window.location.reload()
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
       }
     },
-    verification() {
-      return localStorage.getItem('nameVue') && localStorage.getItem('loggedVue')
-    },
+  },
+  async mounted() {
+    try {
+      const dado = await fetch('https://mate.academy/students-api/users')
+      this.dados = await dado.json()
+    } catch (error) {
+      this.isError = true
+      this.err = error
+    }
   },
 }
 </script>
 
 <template>
   <section class="container is-flex is-justify-content-center">
-    <form @submit.prevent="handleSubmit" class="box mt-5" v-if="!isLoading">
+    <form @submit.prevent="submit" class="box mt-5" v-if="!isLoading">
       <h1 class="title is-3">You need to register</h1>
 
       <div class="field">
@@ -66,10 +89,10 @@ export default {
           </span>
         </div>
 
-        <p class="help is-danger">error message</p>
+        <p v-if="isError" class="help is-danger">{{ err }}</p>
       </div>
 
-      <div class="field" v-if="!first">
+      <div class="field" v-if="first">
         <label class="label" for="user-name"> Your Name </label>
 
         <div class="control has-icons-left">
@@ -89,7 +112,7 @@ export default {
           </span>
         </div>
 
-        <p class="help is-danger">error message</p>
+        <p v-if="isError" class="help is-danger">{{ err }}</p>
       </div>
 
       <div class="field">

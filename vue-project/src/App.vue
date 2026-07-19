@@ -1,6 +1,7 @@
 <script lang="ts">
 import LoginView from './components/LoginView.vue'
 import PostsView from './components/PostsView.vue'
+
 export default {
   components: {
     LoginView,
@@ -8,19 +9,20 @@ export default {
   },
   data() {
     return {
-      emailVue: localStorage.getItem('emailVue') || null,
+      email: localStorage.getItem('emLogin') || '',
     }
   },
   methods: {
-    login(email: string) {
-      this.emailVue = email
+    logout() {
+      this.email = ''
     },
   },
 }
 </script>
+
 <template>
   <div id="app">
-    <LoginView v-if="!emailVue" @onLogin="login" />
-    <PostsView v-else :email="emailVue" />
+    <LoginView v-if="!email" />
+    <PostsView v-else @logout="logout" />
   </div>
 </template>
